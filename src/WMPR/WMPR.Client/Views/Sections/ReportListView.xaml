@@ -1,0 +1,63 @@
+﻿<UserControl x:Class="WMPR.Client.Views.Sections.ReportListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:WMPR.Client.Views.Sections"
+             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:sections="clr-namespace:WMPR.Client.ViewModels.Sections"
+             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:framework="clr-namespace:WMPR.Client.Framework"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance sections:ReportListViewModel}"
+			 x:Name="Control"
+             d:DesignHeight="300" d:DesignWidth="500">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="10" />
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="10" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition />
+				<RowDefinition Height="10" />
+			</Grid.RowDefinitions>
+			<TextBox controls:TextBoxHelper.Watermark="Log URL"
+			         controls:TextBoxHelper.UseFloatingWatermark="False">
+				<TextBox.Text>
+					<Binding Path="NewReportUrl" UpdateSourceTrigger="PropertyChanged" />
+				</TextBox.Text>
+				<TextBox.InputBindings>
+					<KeyBinding Key="Enter" Command="{Binding Path=CreateNewReportCommand}" />
+				</TextBox.InputBindings>
+			</TextBox>
+			<Button Grid.Column="2" Command="{Binding Path=CreateNewReportCommand}" Content="Log eintragen" />
+			<Button Grid.Column="4" Command="{Binding Path=ClearCacheCommand}" Content="Cache leeren" />
+		</Grid>
+
+		<ListView Grid.Row="1" ItemsSource="{Binding Path=Reports, UpdateSourceTrigger=PropertyChanged}">
+			<ListView.ItemTemplate>
+				<DataTemplate>
+
+					<DockPanel>
+						<UniformGrid DockPanel.Dock="Right" Columns="1" Rows="1">
+						<Button Content="Auswerten" VerticalAlignment="Center" Command="{Binding ElementName=Control, Path=DataContext.OpenReportCommand}" CommandParameter="{Binding Path=.}"></Button>
+						</UniformGrid>
+						<StackPanel Orientation="Vertical">
+							<TextBlock Text="{Binding Path=DisplayText}" FontSize="16" FontWeight="Bold" />
+							<TextBlock Text="{Binding Path=LoaderText}" FontSize="12" />
+						</StackPanel>
+					</DockPanel>
+
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>
+	</Grid>
+</UserControl>
