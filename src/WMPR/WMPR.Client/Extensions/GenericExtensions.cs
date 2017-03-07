@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace WMPR.Client.Extensions
 {
@@ -28,6 +30,19 @@ namespace WMPR.Client.Extensions
 			}
 
 			return false;
+		}
+
+		public static IEnumerable<TOut> SelectWhere<TIn, TOut>(this IEnumerable<TIn> source, Predicate<TIn> where, Func<TIn, TOut> select)
+		{
+			if (source == null) throw new ArgumentNullException(nameof(source));
+			if (@where == null) throw new ArgumentNullException(nameof(@where));
+			if (@select == null) throw new ArgumentNullException(nameof(@select));
+
+			foreach (var @in in source)
+			{
+				if (where(@in))
+					yield return select(@in);
+			}
 		}
 	}
 }

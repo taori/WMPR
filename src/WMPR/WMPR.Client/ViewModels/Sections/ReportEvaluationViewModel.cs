@@ -10,6 +10,8 @@ namespace WMPR.Client.ViewModels.Sections
 		public ReportEvaluationViewModel(ReportViewModel report)
 		{
 			Report = report;
+
+			DisplayName = $"Auswertung für {report.Url}";
 		}
 
 		public int Order { get; }
