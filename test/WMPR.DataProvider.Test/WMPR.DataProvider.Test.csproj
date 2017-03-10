@@ -61,6 +61,7 @@
     <Compile Include="FightRequestTemplateResolutionTests.cs" />
     <Compile Include="GenericDamageTakenReportProviderTests.cs" />
     <Compile Include="GenericHitDetectionReportProviderTests.cs" />
+    <Compile Include="ReportMetadataProviderTests.cs" />
     <Compile Include="ReportProviderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

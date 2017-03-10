@@ -38,7 +38,11 @@ namespace WMPR.Client.ViewModels.Sections
 			newTab.DisplayName = reportViewModel.ReportId;
 			ITabsHost host;
 			if (DI.TryGetService<ITabsHost>(out host))
-				host.Add(newTab);
+			{
+				if (host.Add(newTab))
+					host.Activate(newTab);
+			}
+				
 		}
 
 		private string _newReportUrl;

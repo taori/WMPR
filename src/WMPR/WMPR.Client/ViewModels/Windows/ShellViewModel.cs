@@ -32,14 +32,41 @@ namespace WMPR.Client.ViewModels.Windows
 			ActivateItem(item);
 		}
 
-		public void Add(IMainTabsControl tab)
+		public bool Add(IMainTabsControl tab)
 		{
-			Items.Add(tab);
+			var evaluation = tab as ReportEvaluationViewModel;
+			if (evaluation != null)
+			{
+				var openTab = Items.Where(d => d is ReportEvaluationViewModel).Cast<ReportEvaluationViewModel>().FirstOrDefault(d => d.Report.ReportId == evaluation.Report.ReportId);
+				if (openTab != null)
+				{
+					Activate(openTab);
+					openTab.ReloadDataCommand?.Execute(null);
+					return false;
+				}
+				else
+				{
+					Items.Add(tab);
+					return true;
+				}
+			}
+			else
+			{
+				Items.Add(tab);
+			}
+
+			return true;
 		}
 
 		public void Activate(IMainTabsControl tab)
 		{
 			ActivateItem(tab);
+		}
+
+		public void CloseQuery(IMainTabsControl tab)
+		{
+			ActivateItem(Items[0]);
+			Items.Remove(tab);
 		}
 	}
 
@@ -47,7 +74,7 @@ namespace WMPR.Client.ViewModels.Windows
 	[InheritedExport(typeof(ITabsHost))]
 	public interface ITabsHost
 	{
-		void Add(IMainTabsControl tab);
+		bool Add(IMainTabsControl tab);
 		void Activate(IMainTabsControl tab);
 	}
 }

@@ -6,13 +6,32 @@
              xmlns:local="clr-namespace:WMPR.Client.Views.Sections"
              xmlns:sections="clr-namespace:WMPR.Client.ViewModels.Sections"
              mc:Ignorable="d"
-			 d:DataContext="{d:DesignInstance sections:ReportEvaluationViewModel}"
+             d:DataContext="{d:DesignInstance sections:ReportEvaluationViewModel}"
              d:DesignHeight="300" d:DesignWidth="300">
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-		<Label Content="{Binding Path=DisplayName}"></Label>
+		<StackPanel >
+			<TextBlock Margin="0,10" Text="{Binding Path=HyperlinkText}" FontSize="20" />
+			<StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+				<Button Content="Daten aktualisieren" Command="{Binding Path=ReloadDataCommand}" Margin="0,0,10,0"></Button>
+				<Button Content="Bericht im Browser öffnen" Command="{Binding Path=HyperlinkOpenCommand}" Margin="0,0,10,0"></Button>
+			</StackPanel>
+		</StackPanel>
+
+		<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible">
+			<ItemsControl  ItemsSource="{Binding Path=Encounters}">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<StackPanel Margin="0,0,0,10">
+							<TextBlock Text="{Binding Path=BossName}" FontSize="24" Margin="0,0,0,10"/>
+							<DataGrid ItemsSource="{Binding Path=ResultData}" AutoGenerateColumns="True" />
+						</StackPanel>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
 	</Grid>
 </UserControl>
