@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using System.Windows.Input;
 using Caliburn.Micro;
 using Newtonsoft.Json.Converters;
@@ -31,6 +32,30 @@ namespace WMPR.Client.ViewModels.Sections
 			HyperlinkReference = report.Url;
 			HyperlinkOpenCommand = new RelayCommand(HyperlinkOpenExecute);
 			ReloadDataCommand = new RelayCommand(ReloadDataExecute);
+			NextEncounterCommand = new RelayCommand(NextEncounterExecute);
+			PreviousEncounterCommand = new RelayCommand(PreviousEncounterExecute);
+		}
+
+		private void NextEncounterExecute(object obj)
+		{
+			if (Encounters == null)
+				return;
+			var view = CollectionViewSource.GetDefaultView(Encounters);
+			if (view == null)
+				return;
+			if (!view.MoveCurrentToNext())
+				view.MoveCurrentToPrevious();
+		}
+
+		private void PreviousEncounterExecute(object obj)
+		{
+			if (Encounters == null)
+				return;
+			var view = CollectionViewSource.GetDefaultView(Encounters);
+			if (view == null)
+				return;
+			if (!view.MoveCurrentToPrevious())
+				view.MoveCurrentToNext();
 		}
 
 		private async void ReloadDataExecute(object obj)
@@ -44,6 +69,32 @@ namespace WMPR.Client.ViewModels.Sections
 		}
 
 		public int Order { get; }
+
+		private ICommand _nextEncounterCommand;
+
+		public ICommand NextEncounterCommand
+		{
+			get { return _nextEncounterCommand; }
+			set
+			{
+				if (Equals(value, _nextEncounterCommand)) return;
+				_nextEncounterCommand = value;
+				NotifyOfPropertyChange();
+			}
+		}
+
+		private ICommand _previousEncounterCommand;
+
+		public ICommand PreviousEncounterCommand
+		{
+			get { return _previousEncounterCommand; }
+			set
+			{
+				if (Equals(value, _previousEncounterCommand)) return;
+				_previousEncounterCommand = value;
+				NotifyOfPropertyChange();
+			}
+		}
 
 		private string _reportDate;
 
@@ -142,6 +193,7 @@ namespace WMPR.Client.ViewModels.Sections
 		}
 
 		bool _previouslyActivated;
+
 		protected override async void OnActivate()
 		{
 			base.OnActivate();
@@ -204,6 +256,10 @@ namespace WMPR.Client.ViewModels.Sections
 				var encounter = CreateEncounterGroup(bossFightList, fightByBoss, fightById);
 				result.Add(encounter);
 			}
+
+			var view = CollectionViewSource.GetDefaultView(result);
+			if (result.Count > 0)
+				view?.MoveCurrentToFirst();
 
 //			var encounter = new EncounterGroupViewModel();
 //			encounter.BossName = "Boss1";
@@ -280,11 +336,11 @@ namespace WMPR.Client.ViewModels.Sections
 			}
 		}
 
-		private ObservableCollection<DynamicGridCell> _resultData;
+		private ObservableCollection<object> _resultData;
 
-		public ObservableCollection<DynamicGridCell> ResultData
+		public ObservableCollection<object> ResultData
 		{
-			get { return _resultData ?? (_resultData = new ObservableCollection<DynamicGridCell>()); }
+			get { return _resultData ?? (_resultData = new ObservableCollection<object>()); }
 			set
 			{
 				if (object.Equals(_resultData, value))

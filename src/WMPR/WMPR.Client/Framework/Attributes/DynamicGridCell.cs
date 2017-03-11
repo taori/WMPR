@@ -84,12 +84,12 @@ namespace WMPR.Client.Framework.Attributes
 			return this;
 		}
 
-		IEnumerator IEnumerable.GetEnumerator()
+		public IEnumerator GetEnumerator()
 		{
 			return _values.GetEnumerator();
 		}
 
-		public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+		IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
 		{
 			return _values.GetEnumerator();
 		}
@@ -124,7 +124,7 @@ namespace WMPR.Client.Framework.Attributes
 			return false;
 		}
 
-		int ICollection<KeyValuePair<string, object>>.Count => _values.Count;
+		public int Count => _values.Count;
 
 		bool ICollection<KeyValuePair<string, object>>.IsReadOnly => false;
 
@@ -164,7 +164,7 @@ namespace WMPR.Client.Framework.Attributes
 			}
 		}
 
-		ICollection<string> IDictionary<string, object>.Keys => _values.Keys;
-		ICollection<object> IDictionary<string, object>.Values => _values.Values;
+		public ICollection<string> Keys => _values.Keys;
+		public ICollection<object> Values => _values.Values;
 	}
 }
