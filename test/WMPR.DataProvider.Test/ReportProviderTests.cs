@@ -17,7 +17,7 @@ namespace WMPR.DataProvider.Test
 		[Test, TestCaseSource(nameof(_sampleReports))]
 		public async Task VerifyTestDownloadAndSerialization(string reportId)
 		{
-			var provider = new ReportProvider();
+			var provider = new ReportDataProvider();
 			var result = await provider.GetReportDataAsync(reportId);
 			Assert.That(result, Is.Not.Null, "Report data sollte nicht null sein.");
 		}

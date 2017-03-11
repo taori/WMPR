@@ -4,7 +4,7 @@ using WMPR.DataProvider.Json;
 
 namespace WMPR.DataProvider
 {
-	public class ReportProvider : WarcraftLogsProviderBase, IReportProvider
+	public class ReportDataProvider : WarcraftLogsProviderBase, IReportProvider
 	{
 		public async Task<ReportData> GetReportDataAsync(string reportId)
 		{

@@ -25,7 +25,7 @@ namespace WMPR.Client.ViewModels.Sections
 
 		public async Task LoadAsync()
 		{
-			var reportProvider = new ReportProvider();
+			var reportProvider = new ReportDataProvider();
 			LoaderText = "Daten werden geladen ...";
 			var reportData = await CachingLoader.GetCachedOrLoadAsync(async () => await reportProvider.GetReportDataAsync(ReportId), false, "Cache", "Reports", $"{ReportId}.json");
 

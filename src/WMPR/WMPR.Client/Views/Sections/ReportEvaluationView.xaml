@@ -27,7 +27,7 @@
 					<DataTemplate>
 						<StackPanel Margin="0,0,0,10">
 							<TextBlock Text="{Binding Path=BossName}" FontSize="24" Margin="0,0,0,10"/>
-							<DataGrid ItemsSource="{Binding Path=ResultData}" AutoGenerateColumns="True" />
+							<DataGrid ItemsSource="{Binding Path=ResultData}" AutoGenerateColumns="True" IsManipulationEnabled="False" IsReadOnly="True" />
 						</StackPanel>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>

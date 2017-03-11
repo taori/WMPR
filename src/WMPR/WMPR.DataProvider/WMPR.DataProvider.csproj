@@ -63,7 +63,7 @@
     <Compile Include="Json\ReportData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportMetaDataProvider.cs" />
-    <Compile Include="ReportProvider.cs" />
+    <Compile Include="ReportDataProvider.cs" />
     <Compile Include="RequestWildcard.cs" />
     <Compile Include="WarcraftLogsProviderBase.cs" />
   </ItemGroup>
