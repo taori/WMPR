@@ -18,6 +18,20 @@ namespace WMPR.Client.Extensions
 			}
 		}
 
+		public static int IndexOf<T>(this IList<T> source, Predicate<T> condition)
+		{
+			if (source == null) throw new ArgumentNullException(nameof(source));
+			if (condition == null) throw new ArgumentNullException(nameof(condition));
+
+			for (int i = 0; i < source.Count; i++)
+			{
+				if (condition(source[i]))
+					return i;
+			}
+
+			return -1;
+		}
+
 		public static bool In<T>(this T source, params T[] options)
 		{
 			var comparer = EqualityComparer<T>.Default;

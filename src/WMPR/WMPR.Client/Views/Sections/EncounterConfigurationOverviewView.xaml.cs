@@ -18,9 +18,9 @@ namespace WMPR.Client.Views.Sections
 	/// <summary>
 	/// Interaktionslogik für BossConfigurationView.xaml
 	/// </summary>
-	public partial class BossConfigurationView : UserControl
+	public partial class EncounterConfigurationOverviewView : UserControl
 	{
-		public BossConfigurationView()
+		public EncounterConfigurationOverviewView()
 		{
 			InitializeComponent();
 		}

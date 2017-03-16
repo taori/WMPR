@@ -135,6 +135,12 @@
     <Compile Include="Framework\Converters\BooleanConverterInverted.cs" />
     <Compile Include="Framework\Converters\BooleanToVisibilityConverterInverted.cs" />
     <Compile Include="Framework\RelayCommand.cs" />
+    <Compile Include="Model\EncounterConfigurationData.cs" />
+    <Compile Include="Model\EncounterConfigurationManager.cs" />
+    <Compile Include="Model\IEncounterConfigurationManager.cs" />
+    <Compile Include="Utility\ParserFactory.cs" />
+    <Compile Include="Utility\SelectorOption.cs" />
+    <Compile Include="ViewModels\Sections\EncounterConfigurationViewModel.cs" />
     <Compile Include="ViewModels\Sections\ReportEvaluationViewModel.cs" />
     <Compile Include="ViewModels\Sections\ReportListViewModel.cs" />
     <Compile Include="ViewModels\Sections\ReportViewModel.cs" />
@@ -165,9 +171,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>WindowResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\Sections\BossConfigurationViewModel.cs" />
-    <Compile Include="Views\Sections\BossConfigurationView.xaml.cs">
-      <DependentUpon>BossConfigurationView.xaml</DependentUpon>
+    <Compile Include="ViewModels\Sections\EncounterConfigurationOverviewViewModel.cs" />
+    <Compile Include="Views\Sections\EncounterConfigurationOverviewView.xaml.cs">
+      <DependentUpon>EncounterConfigurationOverviewView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Sections\EncounterConfigurationView.xaml.cs">
+      <DependentUpon>EncounterConfigurationView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Sections\ReportEvaluationView.xaml.cs">
       <DependentUpon>ReportEvaluationView.xaml</DependentUpon>
@@ -199,7 +208,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Sections\BossConfigurationView.xaml">
+    <Page Include="Views\Sections\EncounterConfigurationOverviewView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Sections\EncounterConfigurationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

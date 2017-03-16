@@ -4,15 +4,17 @@ using WMPR.Client.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Composition.Convention;
+using System.Linq;
 using Caliburn.Micro;
 using WMPR.Client.Mef;
 using WMPR.Client.ViewModels.Windows;
+using WMPR.DataProvider;
 
 namespace WMPR.Client
 {
 	public static class DI
 	{
-		public static CompositionHost Container;
+		public static CompositionHost Container { get; set; }
 
 		public static bool TryGetService<TService>(out TService instance, string contractName = null)
 		{ 
@@ -20,6 +22,14 @@ namespace WMPR.Client
 				return Container.TryGetExport(contractName, out instance);
 
 			return Container.TryGetExport(out instance);
+		}
+
+		public static bool TryGetServices<TService>(out TService[] instances, string contractName = null)
+		{
+			if (contractName != null)
+				return Container.TryGetExport(contractName, out instances);
+				
+			return Container.TryGetExport(out instances);
 		}
 	}
 
@@ -59,7 +69,7 @@ namespace WMPR.Client
 
 		private static Assembly[] GetAllAssemblies()
 		{
-			return new[] { Assembly.GetExecutingAssembly(), typeof(IWindowManager).Assembly };
+			return new[] { Assembly.GetExecutingAssembly(), typeof(IWindowManager).Assembly, typeof(IWarcraftLogsContentParser).Assembly };
 		}
 
 		protected override object GetInstance(Type service, string key)

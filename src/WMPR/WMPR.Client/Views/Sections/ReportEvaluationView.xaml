@@ -8,7 +8,7 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance sections:ReportEvaluationViewModel}"
              d:DesignHeight="300" d:DesignWidth="300">
-	<Grid>
+	<Grid IsEnabled="{Binding Path=IsLoading, Converter={StaticResource BooleanConverterInverted}}">
 		<Grid.InputBindings>
 			<KeyBinding Key="Up" Modifiers="Control" Command="{Binding Path=PreviousEncounterCommand}" />
 			<KeyBinding Key="Down" Modifiers="Control" Command="{Binding Path=NextEncounterCommand}" />
@@ -17,34 +17,40 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-		<StackPanel Margin="0,0,0,20">
+		<StackPanel>
 			<TextBlock Margin="0,10" Text="{Binding Path=HyperlinkText}" FontSize="20" />
-			<StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+			<StackPanel Orientation="Horizontal" Margin="{StaticResource ContentPaddingBottomOnly}">
 				<Button Content="Daten aktualisieren" Command="{Binding Path=ReloadDataCommand}" Margin="0,0,10,0" />
 				<Button Content="Bericht im Browser öffnen" Command="{Binding Path=HyperlinkOpenCommand}" Margin="0,0,10,0" />
 			</StackPanel>
 		</StackPanel>
 
-		<DockPanel Margin="0,0,0,10" Grid.Row="1">
-			<ComboBox
-				DockPanel.Dock="Top"
-				ToolTip="Control+Up/Down"
-				Margin="0,0,0,10"
-				SelectedIndex="0"
-				ItemsSource="{Binding Path=Encounters, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-				IsSynchronizedWithCurrentItem="True">
-				<ComboBox.InputBindings>
-					<KeyBinding Key="Up" Modifiers="Control" Command="{Binding Path=PreviousEncounterCommand}" />
-					<KeyBinding Key="Down" Modifiers="Control" Command="{Binding Path=NextEncounterCommand}" />
-				</ComboBox.InputBindings>
-				<ComboBox.ItemTemplate>
-					<DataTemplate>
-						<TextBlock
-							Text="{Binding Path=BossName, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-							FontSize="24" />
-					</DataTemplate>
-				</ComboBox.ItemTemplate>
-			</ComboBox>
+		<DockPanel Margin="{StaticResource ContentPaddingBottomOnly}" Grid.Row="1">
+			<DockPanel DockPanel.Dock="Top" Margin="{StaticResource ContentPaddingBottomOnly}">
+				<Button DockPanel.Dock="Right"
+				        Content="Konfiguration bearbeiten"
+				        Command="{Binding Path=Encounters/Configuration.PromptAsEditCommand}"
+						Height="{Binding ElementName=cbx, Path=ActualHeight}"
+				        Margin="10,0,0,0" />
+				<ComboBox
+					x:Name="cbx" 
+					ToolTip="Control+Up/Down"
+					SelectedIndex="0"
+					ItemsSource="{Binding Path=Encounters, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+					IsSynchronizedWithCurrentItem="True">
+					<ComboBox.InputBindings>
+						<KeyBinding Key="Up" Modifiers="Control" Command="{Binding Path=PreviousEncounterCommand}" />
+						<KeyBinding Key="Down" Modifiers="Control" Command="{Binding Path=NextEncounterCommand}" />
+					</ComboBox.InputBindings>
+					<ComboBox.ItemTemplate>
+						<DataTemplate>
+							<TextBlock
+								Text="{Binding Path=BossName, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+								FontSize="24" />
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
+			</DockPanel>
 			<DataGrid IsSynchronizedWithCurrentItem="True"
 			          ItemsSource="{Binding Path=Encounters/ResultData, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
 			          AutoGenerateColumns="True"

@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Serialization;
 
 namespace WMPR.DataProvider
 {
@@ -8,12 +9,10 @@ namespace WMPR.DataProvider
 		{
 			RequestTemplate = requestTemplate;
 			Id = id;
-			if (string.IsNullOrEmpty(RequestTemplate))
-				throw new ArgumentNullException(nameof(RequestTemplate));
 		}
-
+		
 		public string RequestTemplate { get; set; }
-
+		
 		public string Id { get; set; }
 	}
 }

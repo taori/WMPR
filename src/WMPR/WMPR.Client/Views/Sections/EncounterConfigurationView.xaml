@@ -1,0 +1,59 @@
+﻿<UserControl x:Class="WMPR.Client.Views.Sections.EncounterConfigurationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:WMPR.Client.Views.Sections"
+             xmlns:sections="clr-namespace:WMPR.Client.ViewModels.Sections"
+             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance sections:EncounterConfigurationViewModel}"
+             d:DesignHeight="300" d:DesignWidth="300">
+	<DockPanel>
+		<StackPanel
+			Orientation="Horizontal"
+			DockPanel.Dock="Top"
+			Margin="{StaticResource ContentPaddingBottomOnly}">
+			<Button
+				Margin="{StaticResource ContentPaddingRightOnly}"
+				Command="{Binding Path=SaveCommand}"
+				Content="Konfiguration speichern" />
+			<Button
+				Margin="{StaticResource ContentPaddingRightOnly}"
+				Command="{Binding Path=NewTemplateCommand}"
+				Content="Auswertungsfeld anlegen" />
+		</StackPanel>
+		<TextBox DockPanel.Dock="Top"
+		         Text="{Binding Path=BossMapping, UpdateSourceTrigger=PropertyChanged}"
+		         controls:TextBoxHelper.Watermark="Bossmapping"
+		         Margin="{StaticResource ContentPaddingBottomOnly}"
+		         ToolTip="Akzeptiert Eingaben im Stil 'Aluriel,Spellblade Aluriel'" />
+		<ScrollViewer>
+			<ItemsControl ItemsSource="{Binding Path=Templates}">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<Border Padding="0,10" Margin="{StaticResource ContentPaddingBottomOnly}">
+							<StackPanel Orientation="Vertical">
+								<TextBox
+									Margin="{StaticResource ContentPaddingBottomOnly}"
+									Text="{Binding Path=Template.RequestTemplate, UpdateSourceTrigger=PropertyChanged}"
+									controls:TextBoxHelper.Watermark="Request template" />
+								<ComboBox
+									Margin="{StaticResource ContentPaddingBottomOnly}"
+									ItemsSource="{Binding Path=ParserTypeOptions}" 
+									SelectedValue="{Binding Path=ParserTypeName, UpdateSourceTrigger=PropertyChanged}"
+									SelectedValuePath="Value" 
+									DisplayMemberPath="DisplayText" />
+								<ComboBox
+									ItemsSource="{Binding Path=FieldOptions}" 
+									SelectedValue="{Binding Path=FieldWildcard, UpdateSourceTrigger=PropertyChanged}"
+									SelectedValuePath="Value" 
+									DisplayMemberPath="DisplayText"/>
+							</StackPanel>
+						</Border>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
+	</DockPanel>
+</UserControl>

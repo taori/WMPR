@@ -16,6 +16,7 @@ using WMPR.Client.Extensions;
 using WMPR.Client.Framework;
 using WMPR.Client.Framework.Attributes;
 using WMPR.Client.Interfaces;
+using WMPR.Client.Model;
 using WMPR.DataProvider;
 using WMPR.DataProvider.Json;
 
@@ -192,6 +193,20 @@ namespace WMPR.Client.ViewModels.Sections
 			}
 		}
 
+		private bool _isLoading;
+
+		public bool IsLoading
+		{
+			get { return _isLoading; }
+			set
+			{
+				if (object.Equals(_isLoading, value))
+					return;
+				_isLoading = value;
+				NotifyOfPropertyChange(nameof(IsLoading));
+			}
+		}
+
 		bool _previouslyActivated;
 
 		protected override async void OnActivate()
@@ -207,34 +222,24 @@ namespace WMPR.Client.ViewModels.Sections
 
 		private async Task LoadDataAsync()
 		{
+			IsLoading = true;
+
 			DisplayName = "Lade Daten ...";
 			Encounters.Clear();
 
 			await ExtractReportMetaInfoAsync();
 			var reportData = await GetReportDataAsync();
 
-			var encounters = BuildEncounters(reportData);
+			var encounters = await BuildEncounters(reportData);
 
 			Encounters.AddRange(encounters);
+
+			IsLoading = false;
 		}
 
-		private List<EncounterGroupViewModel> BuildEncounters(ReportData reportData)
+		private async Task<List<EncounterGroupViewModel>> BuildEncounters(ReportData reportData)
 		{
 			var result = new List<EncounterGroupViewModel>();
-
-//			var encounter = new EncounterGroupViewModel();
-//			encounter.BossName = "Boss1";
-//			encounter.ResultData.Add(new { Hi = "what", Hi2 = "what3" });
-//			encounter.ResultData.Add(new { Hi = "what2", Hi2 = "what4" });
-//			result.Add(encounter);
-//
-//			encounter = new EncounterGroupViewModel();
-//			encounter.BossName = "Boss2";
-//			encounter.ResultData.Add(new { Hi = "what", Hi2 = "what3" });
-//			encounter.ResultData.Add(new { Hi = "what2", Hi2 = "what4" });
-//			result.Add(encounter);
-
-//			var cell = new DynamicGridCell();
 
 			var fightByBoss = new Dictionary<string, HashSet<int>>();
 			var fightById = new Dictionary<int, Fight>();
@@ -251,27 +256,25 @@ namespace WMPR.Client.ViewModels.Sections
 				set.Add(fight.id);
 			}
 
-			foreach (var bossFightList in fightByBoss)
+			IEncounterConfigurationManager encounterConfigurationManager;
+			List<EncounterConfigurationData> configurations = new List<EncounterConfigurationData>();
+
+			if (DI.TryGetService<IEncounterConfigurationManager>(out encounterConfigurationManager))
+				configurations = await encounterConfigurationManager.GetAllAsync();
+			var configurationViewModels = configurations.Select(config => new EncounterConfigurationViewModel(config)).ToList();
+
+			foreach (var bossFightList in fightByBoss.OrderBy(d => d.Key))
 			{
 				var encounter = CreateEncounterGroup(bossFightList, fightByBoss, fightById);
+				var configurationMatch = configurationViewModels.FirstOrDefault(d => d.IsValidForBoss(bossFightList.Key));
+				encounter.Configuration = configurationMatch ?? new EncounterConfigurationViewModel() {BossMapping = bossFightList.Key };
+
 				result.Add(encounter);
 			}
 
 			var view = CollectionViewSource.GetDefaultView(result);
 			if (result.Count > 0)
 				view?.MoveCurrentToFirst();
-
-//			var encounter = new EncounterGroupViewModel();
-//			encounter.BossName = "Boss1";
-//			encounter.ResultData.Add(CreateRow("what1", "what2"));
-//			encounter.ResultData.Add(CreateRow("what3", "what4"));
-//			result.Add(encounter);
-//
-//			encounter = new EncounterGroupViewModel();
-//			encounter.BossName = "Boss2";
-//			encounter.ResultData.Add(CreateRow("what5", "what6"));
-//			encounter.ResultData.Add(CreateRow("what7", "what8"));
-//			result.Add(encounter);
 
 			return result;
 		}
@@ -322,6 +325,18 @@ namespace WMPR.Client.ViewModels.Sections
 
 	public class EncounterGroupViewModel : PropertyChangedBase
 	{
+		private EncounterConfigurationViewModel _configuration;
+		public EncounterConfigurationViewModel Configuration
+		{
+			get { return _configuration; }
+			set
+			{
+				if (Equals(value, _configuration)) return;
+				_configuration = value;
+				NotifyOfPropertyChange();
+			}
+		}
+
 		private string _bossName;
 
 		public string BossName

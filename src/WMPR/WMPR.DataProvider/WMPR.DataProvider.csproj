@@ -55,6 +55,7 @@
     <Compile Include="IFightContentProvider.cs" />
     <Compile Include="IHitDetectionParser.cs" />
     <Compile Include="IReportProvider.cs" />
+    <Compile Include="IWarcraftLogsContentParser.cs" />
     <Compile Include="Json\Enemy.cs" />
     <Compile Include="Json\Fight.cs" />
     <Compile Include="Json\Friendly.cs" />

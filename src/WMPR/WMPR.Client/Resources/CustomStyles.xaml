@@ -29,6 +29,18 @@
 
 	<system:Double x:Key="FontSizeListHeader">20</system:Double>
 	<system:Double x:Key="FontSizeScrollHeader">20</system:Double>
+	<system:Double x:Key="DefaultPaddingValue">10</system:Double>
+
+	<Thickness x:Key="ContentPadding"
+	           Top="{StaticResource DefaultPaddingValue}"
+	           Left="{StaticResource DefaultPaddingValue}"
+	           Bottom="{StaticResource DefaultPaddingValue}"
+	           Right="{StaticResource DefaultPaddingValue}" />
+	<Thickness x:Key="ContentPaddingBottomOnly"
+	           Bottom="{StaticResource DefaultPaddingValue}" />
+	<Thickness x:Key="ContentPaddingRightOnly"
+	           Right="{StaticResource DefaultPaddingValue}" />
+
 	<Thickness x:Key="WindowPadding">15</Thickness>
 	<Thickness x:Key="WindowPaddingTop">0,15,0,0</Thickness>
 	<Thickness x:Key="WindowPaddingBottom">0,0,0,15</Thickness>

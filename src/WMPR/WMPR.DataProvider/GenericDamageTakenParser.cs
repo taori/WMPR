@@ -9,6 +9,10 @@ namespace WMPR.DataProvider
 {
 	public class GenericDamageTakenParser : FightContentProvider, IDamageTakenParser
 	{
+		public GenericDamageTakenParser()
+		{
+		}
+
 		public GenericDamageTakenParser(FightRequestTemplate template)
 		{
 			Template = template;
@@ -117,6 +121,30 @@ namespace WMPR.DataProvider
 		{
 			var content = await this.GetFightContentAsync(Template, context).ConfigureAwait(false);
 			return await GetResultsFromContentAsync(content).ConfigureAwait(false);
+		}
+
+		public void SetTemplate(FightRequestTemplate template)
+		{
+			this.Template = template;
+		}
+
+		public string GetDisplayName()
+		{
+			return "Schadensparser";
+		}
+
+		public IEnumerable<string> GetTemplateKeys()
+		{
+			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.DTPS)}";
+			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.DamageTaken)}";
+			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.PercentageTaken)}";
+			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.PlayerName)}";
+			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Abilities)}.{nameof(DamageTakenResultAbility.Name)}";
+			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Abilities)}.{nameof(DamageTakenResultAbility.Amount)}";
+			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Abilities)}.{nameof(DamageTakenResultAbility.Percentage)}";
+			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Sources)}.{nameof(DamageTakenResultSource.Name)}";
+			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Sources)}.{nameof(DamageTakenResultSource.Amount)}";
+			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Sources)}.{nameof(DamageTakenResultSource.Percentage)}";
 		}
 	}
 }

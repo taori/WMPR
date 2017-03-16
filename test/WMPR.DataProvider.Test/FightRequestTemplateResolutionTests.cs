@@ -8,17 +8,6 @@ namespace WMPR.DataProvider.Test
 	public class FightRequestTemplateResolutionTests
 	{
 		[Test]
-		public void VerifyEmptyTemplate() 
-		{
-			var context = new FightContextData();
-
-			Assert.Throws<ArgumentNullException>(() => FightRequestTemplateResolver.Resolve(new FightRequestTemplate(string.Empty, string.Empty), context));
-			Assert.Throws<ArgumentNullException>(() => FightRequestTemplateResolver.Resolve(null, context));
-			Assert.Throws<ArgumentNullException>(() => FightRequestTemplateResolver.Resolve(new FightRequestTemplate(string.Empty, string.Empty), null));
-			Assert.Throws<ArgumentNullException>(() => FightRequestTemplateResolver.Resolve(null, null));
-		}
-
-		[Test]
 		public void VerifyResolution()
 		{
 			var context = new FightContextData()

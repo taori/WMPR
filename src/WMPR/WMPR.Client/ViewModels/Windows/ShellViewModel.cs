@@ -27,7 +27,7 @@ namespace WMPR.Client.ViewModels.Windows
 
 			var item = new ReportListViewModel();
 			this.Items.Add(item);
-			this.Items.Add(new BossConfigurationViewModel());
+			this.Items.Add(new EncounterConfigurationOverviewViewModel());
 
 			ActivateItem(item);
 		}

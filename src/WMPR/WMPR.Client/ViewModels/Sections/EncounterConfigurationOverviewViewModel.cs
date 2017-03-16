@@ -3,9 +3,9 @@ using WMPR.Client.Interfaces;
 
 namespace WMPR.Client.ViewModels.Sections
 {
-	public class BossConfigurationViewModel : ScreenValidationBase, IMainTabsControl
+	public class EncounterConfigurationOverviewViewModel : ScreenValidationBase, IMainTabsControl
 	{
-		public BossConfigurationViewModel()
+		public EncounterConfigurationOverviewViewModel()
 		{
 			DisplayName = "Auswertungseinstellungen";
 			IsCloseable = false;

@@ -6,6 +6,10 @@ namespace WMPR.DataProvider
 {
 	public class GenericHitDetectionParser : FightContentProvider, IHitDetectionParser
 	{
+		public GenericHitDetectionParser()
+		{
+		}
+
 		public GenericHitDetectionParser(FightRequestTemplate template)
 		{
 			Template = template;
@@ -43,6 +47,25 @@ namespace WMPR.DataProvider
 		{
 			var content = await this.GetFightContentAsync(Template, context).ConfigureAwait(false);
 			return await GetResultsFromContentAsync(content).ConfigureAwait(false);
+		}
+
+		public void SetTemplate(FightRequestTemplate template)
+		{
+			Template = template;
+		}
+
+		public string GetDisplayName()
+		{
+			return "Trefferparser";
+		}
+
+		public IEnumerable<string> GetTemplateKeys()
+		{
+			yield return $"{nameof(HitDetectionResult)}.{nameof(HitDetectionResult.AverageHitDamage)}";
+			yield return $"{nameof(HitDetectionResult)}.{nameof(HitDetectionResult.Casts)}";
+			yield return $"{nameof(HitDetectionResult)}.{nameof(HitDetectionResult.Hits)}";
+			yield return $"{nameof(HitDetectionResult)}.{nameof(HitDetectionResult.PlayerName)}";
+			yield return $"{nameof(HitDetectionResult)}.{nameof(HitDetectionResult.AverageHitDamage)}";
 		}
 	}
 }
