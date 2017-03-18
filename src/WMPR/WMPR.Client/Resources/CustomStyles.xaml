@@ -36,9 +36,12 @@
 	           Left="{StaticResource DefaultPaddingValue}"
 	           Bottom="{StaticResource DefaultPaddingValue}"
 	           Right="{StaticResource DefaultPaddingValue}" />
-	<Thickness x:Key="ContentPaddingBottomOnly"
+
+	<Thickness x:Key="ContentPaddingBottom"
 	           Bottom="{StaticResource DefaultPaddingValue}" />
-	<Thickness x:Key="ContentPaddingRightOnly"
+	<Thickness x:Key="ContentPaddingTopBottom"
+	           Bottom="{StaticResource DefaultPaddingValue}" Top="{StaticResource DefaultPaddingValue}"/>
+	<Thickness x:Key="ContentPaddingRight"
 	           Right="{StaticResource DefaultPaddingValue}" />
 
 	<Thickness x:Key="WindowPadding">15</Thickness>

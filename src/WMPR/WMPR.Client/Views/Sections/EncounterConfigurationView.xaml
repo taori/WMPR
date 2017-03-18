@@ -13,33 +13,34 @@
 		<StackPanel
 			Orientation="Horizontal"
 			DockPanel.Dock="Top"
-			Margin="{StaticResource ContentPaddingBottomOnly}">
+			Margin="{StaticResource ContentPaddingBottom}">
 			<Button
-				Margin="{StaticResource ContentPaddingRightOnly}"
+				Margin="{StaticResource ContentPaddingRight}"
 				Command="{Binding Path=SaveCommand}"
 				Content="Konfiguration speichern" />
 			<Button
-				Margin="{StaticResource ContentPaddingRightOnly}"
+				Margin="{StaticResource ContentPaddingRight}"
 				Command="{Binding Path=NewTemplateCommand}"
 				Content="Auswertungsfeld anlegen" />
+			<TextBlock VerticalAlignment="Center" Text="{Binding AvailableTokenList, StringFormat='Verfügbare URL-Keys: {0}'}"/>
 		</StackPanel>
 		<TextBox DockPanel.Dock="Top"
 		         Text="{Binding Path=BossMapping, UpdateSourceTrigger=PropertyChanged}"
 		         controls:TextBoxHelper.Watermark="Bossmapping"
-		         Margin="{StaticResource ContentPaddingBottomOnly}"
+		         Margin="{StaticResource ContentPaddingBottom}"
 		         ToolTip="Akzeptiert Eingaben im Stil 'Aluriel,Spellblade Aluriel'" />
 		<ScrollViewer>
 			<ItemsControl ItemsSource="{Binding Path=Templates}">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Border Padding="0,10" Margin="{StaticResource ContentPaddingBottomOnly}">
+						<Border Padding="0,10" Margin="{StaticResource ContentPaddingBottom}">
 							<StackPanel Orientation="Vertical">
 								<TextBox
-									Margin="{StaticResource ContentPaddingBottomOnly}"
+									Margin="{StaticResource ContentPaddingBottom}"
 									Text="{Binding Path=Template.RequestTemplate, UpdateSourceTrigger=PropertyChanged}"
 									controls:TextBoxHelper.Watermark="Request template" />
 								<ComboBox
-									Margin="{StaticResource ContentPaddingBottomOnly}"
+									Margin="{StaticResource ContentPaddingBottom}"
 									ItemsSource="{Binding Path=ParserTypeOptions}" 
 									SelectedValue="{Binding Path=ParserTypeName, UpdateSourceTrigger=PropertyChanged}"
 									SelectedValuePath="Value" 

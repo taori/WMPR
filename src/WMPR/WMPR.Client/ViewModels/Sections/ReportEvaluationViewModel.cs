@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using Caliburn.Micro;
@@ -22,6 +23,23 @@ using WMPR.DataProvider.Json;
 
 namespace WMPR.Client.ViewModels.Sections
 {
+	public class SimpleListItemViewModel : PropertyChangedBase
+	{
+		private string _displayText;
+
+		public string DisplayText
+		{
+			get { return _displayText; }
+			set
+			{
+				if (object.Equals(_displayText, value))
+					return;
+				_displayText = value;
+				NotifyOfPropertyChange(nameof(DisplayText));
+			}
+		}
+	}
+
 	public class ReportEvaluationViewModel : ScreenValidationBase, IMainTabsControl
 	{
 		public ReportViewModel Report { get; set; }
@@ -35,6 +53,24 @@ namespace WMPR.Client.ViewModels.Sections
 			ReloadDataCommand = new RelayCommand(ReloadDataExecute);
 			NextEncounterCommand = new RelayCommand(NextEncounterExecute);
 			PreviousEncounterCommand = new RelayCommand(PreviousEncounterExecute);
+			AnalyzeDataCommand = new RelayCommand(AnalyzeDataExecute);
+		}
+
+		private async void AnalyzeDataExecute(object obj)
+		{
+			var casted = obj as EncounterGroupViewModel;
+			var notification = new SimpleListItemViewModel() {DisplayText = DateTime.Now.ToString("F")};
+			AnalyzerNotifications.Add(notification);
+			await RunAnalysisAsync(casted, notification);
+			AnalyzerNotifications.Remove(notification);
+		}
+
+		private async Task RunAnalysisAsync(EncounterGroupViewModel encounterGroupViewModel, SimpleListItemViewModel notification)
+		{
+//		encounterGroupViewModel.Configuration.
+			await Task.Delay(2000);
+
+			await Task.Delay(2000);
 		}
 
 		private void NextEncounterExecute(object obj)
@@ -70,6 +106,20 @@ namespace WMPR.Client.ViewModels.Sections
 		}
 
 		public int Order { get; }
+
+		private ObservableCollection<SimpleListItemViewModel> _runningAnalyzers;
+
+		public ObservableCollection<SimpleListItemViewModel> AnalyzerNotifications
+		{
+			get { return _runningAnalyzers ?? (_runningAnalyzers = new ObservableCollection<SimpleListItemViewModel>()); }
+			set
+			{
+				if (object.Equals(_runningAnalyzers, value))
+					return;
+				_runningAnalyzers = value;
+				NotifyOfPropertyChange(nameof(AnalyzerNotifications));
+			}
+		}
 
 		private ICommand _nextEncounterCommand;
 
@@ -193,6 +243,20 @@ namespace WMPR.Client.ViewModels.Sections
 			}
 		}
 
+		private ICommand _analyzeDataCommand;
+
+		public ICommand AnalyzeDataCommand
+		{
+			get { return _analyzeDataCommand; }
+			set
+			{
+				if (object.Equals(_analyzeDataCommand, value))
+					return;
+				_analyzeDataCommand = value;
+				NotifyOfPropertyChange(nameof(AnalyzeDataCommand));
+			}
+		}
+
 		private bool _isLoading;
 
 		public bool IsLoading
@@ -217,7 +281,14 @@ namespace WMPR.Client.ViewModels.Sections
 				return;
 			_previouslyActivated = true;
 
-			await LoadDataAsync();
+			try
+			{
+				await LoadDataAsync();
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show(e.Message);
+			}
 		}
 
 		private async Task LoadDataAsync()

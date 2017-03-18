@@ -7,55 +7,79 @@
              xmlns:sections="clr-namespace:WMPR.Client.ViewModels.Sections"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance sections:ReportEvaluationViewModel}"
+             x:Name="CONTROL"
              d:DesignHeight="300" d:DesignWidth="300">
 	<Grid IsEnabled="{Binding Path=IsLoading, Converter={StaticResource BooleanConverterInverted}}">
-		<Grid.InputBindings>
-			<KeyBinding Key="Up" Modifiers="Control" Command="{Binding Path=PreviousEncounterCommand}" />
-			<KeyBinding Key="Down" Modifiers="Control" Command="{Binding Path=NextEncounterCommand}" />
-		</Grid.InputBindings>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
+			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
+
 		<StackPanel>
 			<TextBlock Margin="0,10" Text="{Binding Path=HyperlinkText}" FontSize="20" />
-			<StackPanel Orientation="Horizontal" Margin="{StaticResource ContentPaddingBottomOnly}">
-				<Button Content="Daten aktualisieren" Command="{Binding Path=ReloadDataCommand}" Margin="0,0,10,0" />
+			<StackPanel Orientation="Horizontal" Margin="{StaticResource ContentPaddingBottom}">
+				<Button Content="Kämpfe laden" Command="{Binding Path=ReloadDataCommand}" Margin="0,0,10,0" />
 				<Button Content="Bericht im Browser öffnen" Command="{Binding Path=HyperlinkOpenCommand}" Margin="0,0,10,0" />
 			</StackPanel>
 		</StackPanel>
 
-		<DockPanel Margin="{StaticResource ContentPaddingBottomOnly}" Grid.Row="1">
-			<DockPanel DockPanel.Dock="Top" Margin="{StaticResource ContentPaddingBottomOnly}">
-				<Button DockPanel.Dock="Right"
-				        Content="Konfiguration bearbeiten"
-				        Command="{Binding Path=Encounters/Configuration.PromptAsEditCommand}"
-						Height="{Binding ElementName=cbx, Path=ActualHeight}"
-				        Margin="10,0,0,0" />
-				<ComboBox
-					x:Name="cbx" 
-					ToolTip="Control+Up/Down"
+		<DockPanel Margin="{StaticResource ContentPaddingBottom}" Grid.Row="1">
+			<DockPanel DockPanel.Dock="Left" Margin="{StaticResource ContentPaddingRight}">
+				<ListView
+					x:Name="cbx"
 					SelectedIndex="0"
 					ItemsSource="{Binding Path=Encounters, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
 					IsSynchronizedWithCurrentItem="True">
-					<ComboBox.InputBindings>
-						<KeyBinding Key="Up" Modifiers="Control" Command="{Binding Path=PreviousEncounterCommand}" />
-						<KeyBinding Key="Down" Modifiers="Control" Command="{Binding Path=NextEncounterCommand}" />
-					</ComboBox.InputBindings>
-					<ComboBox.ItemTemplate>
+					<ListView.ItemTemplate>
 						<DataTemplate>
-							<TextBlock
-								Text="{Binding Path=BossName, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-								FontSize="24" />
+							<Border Padding="{StaticResource ContentPaddingTopBottom}">
+								<DockPanel>
+									<Button
+									Margin="10,0,0,0"
+									DockPanel.Dock="Right"
+									Content="Konfigurieren"
+									Command="{Binding Path=Configuration.PromptAsEditCommand}" />
+									<Button
+									Margin="10,0,0,0"
+									DockPanel.Dock="Right"
+									Content="Auswerten"
+									CommandParameter="{Binding Path=.}"
+									Command="{Binding Path=DataContext.AnalyzeDataCommand, ElementName=CONTROL}">
+										<Button.Style>
+											<Style TargetType="Button" BasedOn="{StaticResource MetroButton}">
+												<Style.Triggers>
+													<DataTrigger Binding="{Binding Path=Configuration.Templates.Count}" Value="0">
+														<Setter Property="Button.IsEnabled" Value="False" />
+													</DataTrigger>
+												</Style.Triggers>
+											</Style>
+										</Button.Style>
+									</Button>
+									<TextBlock
+									VerticalAlignment="Center"
+									Text="{Binding Path=BossName, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+									FontSize="12" />
+								</DockPanel>
+							</Border>
 						</DataTemplate>
-					</ComboBox.ItemTemplate>
-				</ComboBox>
+					</ListView.ItemTemplate>
+				</ListView>
 			</DockPanel>
+
+			<TextBlock Margin="{StaticResource ContentPaddingBottom}" FontSize="20" DockPanel.Dock="Top" Text="{Binding Path=Encounters/BossName, StringFormat='Auswertung: {0}'}" />
 			<DataGrid IsSynchronizedWithCurrentItem="True"
 			          ItemsSource="{Binding Path=Encounters/ResultData, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
 			          AutoGenerateColumns="True"
 			          IsManipulationEnabled="False"
 			          IsReadOnly="True" />
 		</DockPanel>
+		<ListView Grid.Row="2" ItemsSource="{Binding Path=AnalyzerNotifications}">
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<TextBlock Text="{Binding Path=DisplayText}" />
+				</DataTemplate>
+			</ListView.ItemTemplate>
+		</ListView>
 	</Grid>
 </UserControl>

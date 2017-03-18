@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Controls.Primitives;
 using Caliburn.Micro;
 using WMPR.Client.Framework;
 using WMPR.Client.Interfaces;
@@ -57,7 +58,7 @@ namespace WMPR.Client.ViewModels.Windows
 
 			return true;
 		}
-
+		
 		public void Activate(IMainTabsControl tab)
 		{
 			ActivateItem(tab);
@@ -65,7 +66,11 @@ namespace WMPR.Client.ViewModels.Windows
 
 		public void CloseQuery(IMainTabsControl tab)
 		{
-			ActivateItem(Items[0]);
+			if (Items.Count > 2)
+			{
+				var secondLastTab = Items.Reverse().Skip(1).FirstOrDefault();
+				ActivateItem(secondLastTab);
+			}
 			Items.Remove(tab);
 		}
 	}

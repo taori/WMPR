@@ -24,8 +24,8 @@ namespace WMPR.Client.ViewModels.Sections
 		public EncounterConfigurationViewModel()
 		{
 			SaveCommand = new RelayCommand(SaveExecute);
-			PromptAsEditCommand = new RelayCommand(PromptAsEditExecute);
 			NewTemplateCommand = new RelayCommand(NewTemplateExecute);
+			AvailableTokenList = $"{RequestWildcard.ReportId.Key} {RequestWildcard.FightId.Key} {RequestWildcard.FightStart.Key} {RequestWildcard.FightEnd.Key}";
 		}
 
 		public EncounterConfigurationViewModel(EncounterConfigurationData configurationData) : this()
@@ -102,12 +102,28 @@ namespace WMPR.Client.ViewModels.Sections
 
 		private void NewTemplateExecute(object obj)
 		{
-			Templates.Add(new TemplateViewModel());
+			var templateViewModel = new TemplateViewModel();
+			UpdateParserOptions(templateViewModel);
+			Templates.Add(templateViewModel);
 		}
 
 		public override string DisplayName => $"Konfig ({BossMapping})";
 
 		public EncounterConfigurationData ConfigurationData { get; set; }
+
+		private string _availableTokenList;
+
+		public string AvailableTokenList
+		{
+			get { return _availableTokenList; }
+			set
+			{
+				if (object.Equals(_availableTokenList, value))
+					return;
+				_availableTokenList = value;
+				NotifyOfPropertyChange(nameof(AvailableTokenList));
+			}
+		}
 
 		private void PromptAsEditExecute(object obj)
 		{
@@ -203,7 +219,7 @@ namespace WMPR.Client.ViewModels.Sections
 
 		public ICommand PromptAsEditCommand
 		{
-			get { return _promptAsEditCommand; }
+			get { return _promptAsEditCommand ?? (_promptAsEditCommand = new RelayCommand(PromptAsEditExecute)); }
 			set
 			{
 				if (object.Equals(_promptAsEditCommand, value))
