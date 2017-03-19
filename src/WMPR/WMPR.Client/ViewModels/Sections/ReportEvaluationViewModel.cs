@@ -5,10 +5,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Caliburn.Micro;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -18,12 +20,14 @@ using WMPR.Client.Framework;
 using WMPR.Client.Framework.Attributes;
 using WMPR.Client.Interfaces;
 using WMPR.Client.Model;
+using WMPR.Client.Utility;
 using WMPR.DataProvider;
 using WMPR.DataProvider.Json;
+using Action = System.Action;
 
 namespace WMPR.Client.ViewModels.Sections
 {
-	public class SimpleListItemViewModel : PropertyChangedBase
+	public class SimpleListItemViewModel : PropertyChangedBase, IProgress<string>
 	{
 		private string _displayText;
 
@@ -37,6 +41,11 @@ namespace WMPR.Client.ViewModels.Sections
 				_displayText = value;
 				NotifyOfPropertyChange(nameof(DisplayText));
 			}
+		}
+
+		public void Report(string value)
+		{
+			DisplayText = value;
 		}
 	}
 
@@ -61,16 +70,15 @@ namespace WMPR.Client.ViewModels.Sections
 			var casted = obj as EncounterGroupViewModel;
 			var notification = new SimpleListItemViewModel() {DisplayText = DateTime.Now.ToString("F")};
 			AnalyzerNotifications.Add(notification);
+			var collectionView = CollectionViewSource.GetDefaultView(Encounters);
+			collectionView.MoveCurrentTo(casted);
 			await RunAnalysisAsync(casted, notification);
 			AnalyzerNotifications.Remove(notification);
 		}
 
 		private async Task RunAnalysisAsync(EncounterGroupViewModel encounterGroupViewModel, SimpleListItemViewModel notification)
 		{
-//		encounterGroupViewModel.Configuration.
-			await Task.Delay(2000);
-
-			await Task.Delay(2000);
+			await encounterGroupViewModel.LoadAsync(notification);
 		}
 
 		private void NextEncounterExecute(object obj)
@@ -311,20 +319,13 @@ namespace WMPR.Client.ViewModels.Sections
 		private async Task<List<EncounterGroupViewModel>> BuildEncounters(ReportData reportData)
 		{
 			var result = new List<EncounterGroupViewModel>();
-
-			var fightByBoss = new Dictionary<string, HashSet<int>>();
-			var fightById = new Dictionary<int, Fight>();
-
-			foreach (var fight in reportData.fights)
+			var bossNames = new HashSet<string>(reportData.fights.Select(s => s.name));
+			foreach (var bossName in bossNames)
 			{
-				HashSet<int> set;
-				if (!fightByBoss.TryGetValue(fight.name, out set))
-				{
-					fightByBoss.Add(fight.name, set = new HashSet<int>());
-				}
-
-				fightById.Add(fight.id, fight);
-				set.Add(fight.id);
+				var encounterGroup = new EncounterGroupViewModel();
+				encounterGroup.BossName = bossName;
+				encounterGroup.ReportId = Report.ReportId;
+				result.Add(encounterGroup);
 			}
 
 			IEncounterConfigurationManager encounterConfigurationManager;
@@ -334,13 +335,10 @@ namespace WMPR.Client.ViewModels.Sections
 				configurations = await encounterConfigurationManager.GetAllAsync();
 			var configurationViewModels = configurations.Select(config => new EncounterConfigurationViewModel(config)).ToList();
 
-			foreach (var bossFightList in fightByBoss.OrderBy(d => d.Key))
+			foreach (var group in result)
 			{
-				var encounter = CreateEncounterGroup(bossFightList, fightByBoss, fightById);
-				var configurationMatch = configurationViewModels.FirstOrDefault(d => d.IsValidForBoss(bossFightList.Key));
-				encounter.Configuration = configurationMatch ?? new EncounterConfigurationViewModel() {BossMapping = bossFightList.Key };
-
-				result.Add(encounter);
+				var configurationMatch = configurationViewModels.FirstOrDefault(d => d.IsValidForBoss(group.BossName));
+				group.Configuration = configurationMatch ?? new EncounterConfigurationViewModel() { BossMapping = group.BossName };
 			}
 
 			var view = CollectionViewSource.GetDefaultView(result);
@@ -348,31 +346,6 @@ namespace WMPR.Client.ViewModels.Sections
 				view?.MoveCurrentToFirst();
 
 			return result;
-		}
-
-		private EncounterGroupViewModel CreateEncounterGroup(KeyValuePair<string, HashSet<int>> bossFightList, Dictionary<string, HashSet<int>> fightByBoss, Dictionary<int, Fight> fightById)
-		{
-			var encounter = new EncounterGroupViewModel();
-			encounter.BossName = bossFightList.Key;
-
-			var cell = new DynamicGridCell();
-			cell["Spieler"] = Guid.NewGuid().ToString();
-			cell["Spieler2"] = Guid.NewGuid().ToString();
-			encounter.ResultData.Add(cell);
-
-			return encounter;
-		}
-
-		private static DynamicGridCell CreateRow(string value1, string value2)
-		{
-//			var expandoObject = new ExpandoObject();
-//			var casted = expandoObject as IDictionary<string, object>;
-			var expandoObject = new DynamicGridCell();
-			var casted = expandoObject as IDictionary<string, object>;
-			casted["hiasdasd"] = value1;
-			casted["hiasdasfasdasdd"] = value2;
-			
-			return expandoObject;
 		}
 
 		private async Task<ReportData> GetReportDataAsync()
@@ -396,6 +369,100 @@ namespace WMPR.Client.ViewModels.Sections
 
 	public class EncounterGroupViewModel : PropertyChangedBase
 	{
+		private CancellationTokenSource _cts;
+		public async Task LoadAsync(IProgress<string> progress)
+		{
+			try
+			{
+				if (_cts != null)
+				{
+					progress.Report($"Laufende Analyse wurde abgebrochen.");
+					await Task.Delay(2000);
+					_cts?.Dispose();
+				}
+				_cts = new CancellationTokenSource();
+				await Task.Run(async () => await LoadImplAsync(progress, _cts.Token), _cts.Token);
+			}
+			catch (TaskCanceledException e)
+			{
+				await Task.CompletedTask;
+			}
+		}
+
+		private async Task LoadImplAsync(IProgress<string> progress, CancellationToken cancellationToken)
+		{
+			cancellationToken.ThrowIfCancellationRequested();
+
+			await Task.Delay(2000);
+
+			cancellationToken.ThrowIfCancellationRequested();
+
+			var provider = new ReportDataProvider();
+			progress.Report($"Kampfdaten für {BossName} werden geladen.");
+			var reportData = await provider.GetReportDataAsync(ReportId);
+			var matchingFights = reportData.fights.Where(d => d.name.ToUpper() == BossName.ToUpper()).ToList();
+			progress.Report($"{matchingFights.Count} Kämpfe gefunden.");
+			await Task.Delay(1000);
+
+			cancellationToken.ThrowIfCancellationRequested();
+
+			var templates = Configuration.Templates.ToList();
+			progress.Report($"{templates.Count} Auswertungsfelder gefunden.");
+			await Task.Delay(1000);
+			
+			Dictionary<string, object> tokenValueByPlayer = new Dictionary<string, object>();
+			Dictionary<string, DynamicGridCell> cellByPlayer = new Dictionary<string, DynamicGridCell>();
+
+			var players = new HashSet<string>(reportData.friendlies.Select(s => s.name));
+			foreach (var player in players)
+			{
+				var playerCell = new DynamicGridCell();
+				playerCell["Spieler"] = player;
+				cellByPlayer.Add(player, playerCell);
+			}
+
+			foreach (var template in templates)
+			{
+				tokenValueByPlayer.Clear();
+
+				cancellationToken.ThrowIfCancellationRequested();
+
+				var parser = ParserFactory.GetParser(template.ParserTypeName);
+				parser.SetTemplate(template.Template);
+//				var warcraftLogsContentParser = new GenericDamageTakenParser();
+//				await warcraftLogsContentParser.GetResultsAsync(new FightContextData());
+//				parser = warcraftLogsContentParser;
+				foreach (var fight in matchingFights)
+				{
+					cancellationToken.ThrowIfCancellationRequested();
+					
+					var fightContext = new FightContextData() { Fight = fight, ReportId = ReportId};
+					await parser.ApplyResultMappingAsync(cancellationToken, fightContext, tokenValueByPlayer, template.FieldWildcard);
+				}
+
+				foreach (var playerWithTokenValue in tokenValueByPlayer)
+				{
+					cancellationToken.ThrowIfCancellationRequested();
+
+					DynamicGridCell cell;
+					if (cellByPlayer.TryGetValue(playerWithTokenValue.Key, out cell))
+					{
+						cell[template.FieldWildcard] = playerWithTokenValue.Value;
+					}
+				}
+				
+			}
+
+			var cells = new List<KeyValuePair<string, DynamicGridCell>>();
+			foreach (var cell in cellByPlayer)
+			{
+				cells.Add(cell);
+			}
+
+			await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+				 ResultData.AddRange(cells.Select(s => s.Value))));
+		}
+
 		private EncounterConfigurationViewModel _configuration;
 		public EncounterConfigurationViewModel Configuration
 		{
@@ -435,5 +502,7 @@ namespace WMPR.Client.ViewModels.Sections
 				NotifyOfPropertyChange(nameof(ResultData));
 			}
 		}
+
+		public string ReportId { get; set; }
 	}
 }

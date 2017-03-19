@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WMPR.DataProvider
@@ -135,16 +136,46 @@ namespace WMPR.DataProvider
 
 		public IEnumerable<string> GetTemplateKeys()
 		{
-			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.DTPS)}";
-			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.DamageTaken)}";
-			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.PercentageTaken)}";
-			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.PlayerName)}";
-			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Abilities)}.{nameof(DamageTakenResultAbility.Name)}";
-			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Abilities)}.{nameof(DamageTakenResultAbility.Amount)}";
-			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Abilities)}.{nameof(DamageTakenResultAbility.Percentage)}";
-			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Sources)}.{nameof(DamageTakenResultSource.Name)}";
-			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Sources)}.{nameof(DamageTakenResultSource.Amount)}";
-			yield return $"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Sources)}.{nameof(DamageTakenResultSource.Percentage)}";
+			return KeyValueMappings.Mappings.Keys;
+		}
+
+		private class KeyValueMappings
+		{
+			public static Dictionary<string, Func<DamageTakenResult, KeyValuePair<string, object>>> Mappings = new Dictionary<string, Func<DamageTakenResult, KeyValuePair<string, object>>>()
+			{
+				{$"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.DTPS)}", (result) => new KeyValuePair<string, object>(result.PlayerName, result.DTPS) },
+				{$"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.DamageTaken)}", (result) => new KeyValuePair<string, object>(result.PlayerName, result.DamageTaken) },
+				{$"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.PercentageTaken)}", (result) => new KeyValuePair<string, object>(result.PlayerName, result.PercentageTaken) },
+				{$"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.PlayerName)}", (result) => new KeyValuePair<string, object>(result.PlayerName, result.PlayerName) },
+				{$"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Abilities)}.{nameof(DamageTakenResultAbility.Name)}", (result) => new KeyValuePair<string, object>(result.PlayerName, result.Abilities.FirstOrDefault().Name) },
+				{$"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Abilities)}.{nameof(DamageTakenResultAbility.Amount)}", (result) => new KeyValuePair<string, object>(result.PlayerName, result.Abilities.FirstOrDefault().Amount) },
+				{$"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Abilities)}.{nameof(DamageTakenResultAbility.Percentage)}", (result) => new KeyValuePair<string, object>(result.PlayerName, result.Abilities.FirstOrDefault().Percentage) },
+				{$"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Sources)}.{nameof(DamageTakenResultSource.Name)}", (result) => new KeyValuePair<string, object>(result.PlayerName, result.Sources.FirstOrDefault().Name) },
+				{$"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Sources)}.{nameof(DamageTakenResultSource.Amount)}", (result) => new KeyValuePair<string, object>(result.PlayerName, result.Sources.FirstOrDefault().Amount) },
+				{$"{nameof(DamageTakenResult)}.{nameof(DamageTakenResult.Sources)}.{nameof(DamageTakenResultSource.Percentage)}", (result) => new KeyValuePair<string, object>(result.PlayerName, result.Sources.FirstOrDefault().Percentage) },
+			};
+		}
+
+		public async Task ApplyResultMappingAsync(CancellationToken cancellationToken, FightContextData fightContext, Dictionary<string, object> requestResults, string templateKey)
+		{
+			var results = await GetResultsAsync(fightContext).ConfigureAwait(false);
+			Func<DamageTakenResult, KeyValuePair<string, object>> extractor;
+			if (KeyValueMappings.Mappings.TryGetValue(templateKey, out extractor))
+			{
+				foreach (var parserResult in results)
+				{
+					var output = extractor(parserResult);
+					object value;
+					if (requestResults.TryGetValue(output.Key, out value))
+					{
+						requestResults[output.Key] = output.Value;
+					}
+					else
+					{
+						requestResults.Add(output.Key, output.Value);
+					}
+				}
+			}
 		}
 	}
 }
