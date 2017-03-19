@@ -72,7 +72,16 @@ namespace WMPR.Client.ViewModels.Sections
 			AnalyzerNotifications.Add(notification);
 			var collectionView = CollectionViewSource.GetDefaultView(Encounters);
 			collectionView.MoveCurrentTo(casted);
-			await RunAnalysisAsync(casted, notification);
+
+			try
+			{
+				await RunAnalysisAsync(casted, notification);
+			}
+			catch (Exception e)
+			{
+				notification.DisplayText = e.Message;
+				await Task.Delay(3000);
+			}
 			AnalyzerNotifications.Remove(notification);
 		}
 

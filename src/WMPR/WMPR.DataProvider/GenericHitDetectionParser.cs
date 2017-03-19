@@ -20,7 +20,7 @@ namespace WMPR.DataProvider
 
 		public FightRequestTemplate Template { get; set; }
 
-		public static readonly Regex ParsingRegex = new Regex("<tr[^>]+main-table-row[^>]*>.+?<a[^>]+>(?<name>[^<]+).+?<span[^>]+>(?<dmgTaken>\\d+)\\$.+?<td class=\"num\" >.+?(?<casts>\\d+).+?<td class=\"num tooltip main-table-hits\">.+?(?<hits>\\d+).+?</tr>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+		public static readonly Regex ParsingRegex = new Regex("<tr[^>]+main-table-row[^>]*>.+?<a[^>]+>(?<name>[^<]+).+?<span[^>]+>(?<dmgTaken>\\d+)\\$.+?<td class=\"num\" >.+?(?<casts>\\d+).+?<td class=\"num tooltip main-table-hits\">.+?(?<hits>\\d+).+?</tr>", RegexOptions.IgnoreCase | RegexOptions.Singleline, TimeSpan.FromSeconds(30));
 
 		public async Task<List<HitDetectionResult>> GetResultsFromContentAsync(string content)
 		{
